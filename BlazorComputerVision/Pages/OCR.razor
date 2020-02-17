@@ -1,0 +1,61 @@
+﻿@page "/computer-vision-ocr"
+@using System.IO
+@using BlazorComputerVision.Data
+@inject ComputerVisionService computerVisionService
+
+<h2>Optical Character Recognition (OCR) using Blazor and Azure Computer Vision Cognitive Services</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <textarea disabled class="form-control" rows="15" cols="30">@textData</textarea>
+    </div>
+    <div class="col-md-5">
+        <div class="image-container">
+            <img class="preview-image" src=@imagePreview>
+        </div>
+        <InputFile OnChange="ViewFile" />
+        <p>@status</p>
+        <hr />
+        <button disabled="@loading" class="btn btn-primary btn-lg" @onclick="GetText">
+            @if (loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Extract Text
+        </button>
+    </div>
+</div>
+
+@code {
+    string imagePreview;
+    string textData;
+    bool loading = false;
+    byte[] imageFileBytes;
+    const string status = "Max image size allowed is 5 MB";
+
+    async Task ViewFile(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+        if (file == null)
+        {
+            return;
+        }
+        else
+        {
+            var memoryStream = new MemoryStream();
+            await file.Data.CopyToAsync(memoryStream);
+            imageFileBytes = memoryStream.ToArray();
+            string base64String = Convert.ToBase64String(imageFileBytes, 0, imageFileBytes.Length);
+
+            imagePreview = string.Concat("data:image/png;base64,", base64String);
+            memoryStream.Flush();
+        }
+    }
+
+    private async Task GetText()
+    {
+        loading = true;
+        textData = await computerVisionService.GetTextFromImage(imageFileBytes);
+        loading = false;
+    }
+}
