@@ -1,13 +1,20 @@
 ﻿@page "/computer-vision-ocr"
-@using System.IO
-@using BlazorComputerVision.Data
-@inject ComputerVisionService computerVisionService
+@inherits OCRModel
 
-<h2>Optical Character Recognition (OCR) using Blazor and Azure Computer Vision Cognitive Services</h2>
+<h2>Optical Character Recognition (OCR) Using Blazor and Azure Computer Vision Cognitive Service</h2>
 
 <div class="row">
     <div class="col-md-6">
-        <textarea disabled class="form-control" rows="15" cols="30">@textData</textarea>
+        <textarea disabled class="form-control" rows="10" cols="25">@Result.DetectedText</textarea>
+        <hr />
+        <div class="row">
+            <div class="col-md-4">
+                <label><strong> Detected Language :</strong></label>
+            </div>
+            <div class="col-md-6">
+                <input disabled type="text" class="form-control" value="@DetectedTextLanguage" />
+            </div>
+        </div>
     </div>
     <div class="col-md-5">
         <div class="image-container">
@@ -25,37 +32,3 @@
         </button>
     </div>
 </div>
-
-@code {
-    string imagePreview;
-    string textData;
-    bool loading = false;
-    byte[] imageFileBytes;
-    const string status = "Max image size allowed is 5 MB";
-
-    async Task ViewFile(IFileListEntry[] files)
-    {
-        var file = files.FirstOrDefault();
-        if (file == null)
-        {
-            return;
-        }
-        else
-        {
-            var memoryStream = new MemoryStream();
-            await file.Data.CopyToAsync(memoryStream);
-            imageFileBytes = memoryStream.ToArray();
-            string base64String = Convert.ToBase64String(imageFileBytes, 0, imageFileBytes.Length);
-
-            imagePreview = string.Concat("data:image/png;base64,", base64String);
-            memoryStream.Flush();
-        }
-    }
-
-    private async Task GetText()
-    {
-        loading = true;
-        textData = await computerVisionService.GetTextFromImage(imageFileBytes);
-        loading = false;
-    }
-}
