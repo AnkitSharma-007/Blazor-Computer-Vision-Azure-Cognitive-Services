@@ -34,7 +34,7 @@ namespace BlazorComputerVision.Pages
             LanguageList = availableLanguages.Translation;
         }
 
-        protected async Task ViewFile(IFileListEntry[] files)
+        protected async Task ViewImage(IFileListEntry[] files)
         {
             var file = files.FirstOrDefault();
             if (file == null)

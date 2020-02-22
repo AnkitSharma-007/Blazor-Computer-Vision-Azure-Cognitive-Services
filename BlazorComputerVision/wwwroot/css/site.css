@@ -183,8 +183,8 @@ app {
 }
 
 .preview-image {
-    max-height: 400px;
-    max-width: 400px;
+    max-height: 300px;
+    max-width: 300px;
 }
 
 .image-container {

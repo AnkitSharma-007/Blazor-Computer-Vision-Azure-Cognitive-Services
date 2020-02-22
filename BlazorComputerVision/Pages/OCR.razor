@@ -4,14 +4,14 @@
 <h2>Optical Character Recognition (OCR) Using Blazor and Azure Computer Vision Cognitive Service</h2>
 
 <div class="row">
-    <div class="col-md-6">
-        <textarea disabled class="form-control" rows="10" cols="25">@Result.DetectedText</textarea>
+    <div class="col-md-5">
+        <textarea disabled class="form-control" rows="10" cols="15">@Result.DetectedText</textarea>
         <hr />
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-sm-5">
                 <label><strong> Detected Language :</strong></label>
             </div>
-            <div class="col-md-6">
+            <div class="col-sm-6">
                 <input disabled type="text" class="form-control" value="@DetectedTextLanguage" />
             </div>
         </div>
@@ -20,7 +20,7 @@
         <div class="image-container">
             <img class="preview-image" src=@imagePreview>
         </div>
-        <InputFile OnChange="ViewFile" />
+        <InputFile OnChange="ViewImage" />
         <p>@status</p>
         <hr />
         <button disabled="@loading" class="btn btn-primary btn-lg" @onclick="GetText">
