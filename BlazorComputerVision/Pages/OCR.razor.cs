@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using BlazorComputerVision.Data;
+using BlazorComputerVision.Models;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.IO;
-using BlazorComputerVision.Models;
-using BlazorInputFile;
-using BlazorComputerVision.Data;
+using System.Threading.Tasks;
 
 namespace BlazorComputerVision.Pages
 {
@@ -34,32 +33,30 @@ namespace BlazorComputerVision.Pages
             LanguageList = availableLanguages.Translation;
         }
 
-        protected async Task ViewImage(IFileListEntry[] files)
+        protected async Task ViewImage(InputFileChangeEventArgs e)
         {
-            var file = files.FirstOrDefault();
-            if (file == null)
+            if (e.File.Size > MaxFileSize)
             {
+                status = $"The file size is {e.File.Size} bytes, this is more than the allowed limit of {MaxFileSize} bytes.";
                 return;
             }
-            else if (file.Size > MaxFileSize)
-            {
-                status = $"The file size is {file.Size} bytes, this is more than the allowed limit of {MaxFileSize} bytes.";
-                return;
-            }
-            else if (!file.Type.Contains("image"))
+            else if (!e.File.ContentType.Contains("image"))
             {
                 status = "Please uplaod a valid image file";
                 return;
             }
             else
             {
-                var memoryStream = new MemoryStream();
-                await file.Data.CopyToAsync(memoryStream);
-                imageFileBytes = memoryStream.ToArray();
-                string base64String = Convert.ToBase64String(imageFileBytes, 0, imageFileBytes.Length);
+                using var reader = new StreamReader(e.File.OpenReadStream(MaxFileSize));
+                var format = "image/jpeg";
+                var imageFile = await e.File.RequestImageFileAsync(format, 640, 480);
 
-                imagePreview = string.Concat("data:image/png;base64,", base64String);
-                memoryStream.Flush();
+                using var fileStream = imageFile.OpenReadStream(MaxFileSize);
+                using var memoryStream = new MemoryStream();
+                await fileStream.CopyToAsync(memoryStream);
+                imageFileBytes = memoryStream.ToArray();
+                imagePreview = string.Concat("data:image/png;base64,", Convert.ToBase64String(memoryStream.ToArray()));
+
                 status = DefaultStatus;
             }
         }
