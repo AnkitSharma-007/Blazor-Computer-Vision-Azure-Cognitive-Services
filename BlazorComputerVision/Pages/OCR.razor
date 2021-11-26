@@ -20,7 +20,7 @@
         <div class="image-container">
             <img class="preview-image" src=@imagePreview>
         </div>
-        <InputFile OnChange="ViewImage" />
+        <InputFile OnChange="@ViewImage" />
         <p>@status</p>
         <hr />
         <button disabled="@loading" class="btn btn-primary btn-lg" @onclick="GetText">
